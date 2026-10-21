@@ -1,6 +1,6 @@
 {
-  "name": "Mi Dinero",
-  "short_name": "Mi Dinero",
+  "name": "Mi Dinero App",
+  "short_name": "MiDinero",
   "description": "Control de ingresos, gastos y objetivos de ahorro",
   "lang": "es",
   "start_url": "./",
@@ -8,14 +8,17 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0a0d09",
-  "theme_color": "#0a0d09",
+  "theme_color": "#b8ff3c",
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
-    { "src": "screenshot1", "sizes": "784x1600", "type": "image/jpeg", "purpose": "any" },
-    { "src": "screenshot2", "sizes": "784x1600", "type": "image/jpeg", "purpose": "any" },
-    { "src": "screenshot3", "sizes": "784x1600", "type": "image/jpeg", "purpose": "any" },
-    { "src": "screenshot4", "sizes": "784x1600", "type": "image/jpeg", "purpose": "any" }
-  ]
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "screenshots": [
+    { "src": "screenshot1", "sizes": "784x1600", "type": "image/jpeg", "purpose": "Pantalla principal" },
+    { "src": "screenshot2", "sizes": "784x1600", "type": "image/jpeg", "purpose": "Pantalla principal" },
+    { "src": "screenshot3", "sizes": "784x1600", "type": "image/jpeg", "purpose": "Pantalla principal" },
+    { "src": "screenshot4", "sizes": "784x1600", "type": "image/jpeg", "purpose": "Pantalla principal" }
+  ],
+  "id": "app-midinero"
 }
