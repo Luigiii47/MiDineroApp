@@ -92,8 +92,9 @@ input,select,textarea{font-size:16px}
 <nav id="nav"></nav><main id="app"></main><div id="m"><div id="mb"></div></div><div id="auth"></div><div id="sync"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 <script>
+
 // === CONFIGURACIÓN: pega aquí los datos de tu proyecto Supabase (Project Settings > API) ===
-const SUPABASE_URL='PEGA_AQUI_TU_URL',SUPABASE_ANON_KEY='PEGA_AQUI_TU_ANON_KEY';
+const SUPABASE_URL='https://cemkgxysqwmoaptwaqdw.supabase.co',SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlbWtneHlzcXdtb2FwdHdhcWR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MjQwNjcsImV4cCI6MjEwODEwMDA2N30.HDZrn9SSN6aL5Wh6M7ec2Vrm8jeTwetTq9FJ1XtmIZM';
 const U=()=>'x'+Math.random().toString(36).slice(2,8);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const seed=()=>({accounts:[{id:'a1',name:'Tarjeta',ini:0},{id:'a2',name:'Efectivo',ini:0}],
