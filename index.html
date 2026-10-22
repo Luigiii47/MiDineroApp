@@ -32,7 +32,7 @@ h1{font:700 34px Georgia,serif}.sub{color:var(--mu)}
 .ic{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;font-weight:700;background:var(--bg);flex:none}
 .tx .m{flex:1;min-width:0}.tx .m b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .list{padding:0;overflow:hidden}.lg{display:grid;grid-template-columns:1fr 1fr;column-gap:14px}
-.hide .amt{filter:blur(7px)}
+
 .scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:6px}.scroll .card{min-width:200px}
 input,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px}
 label{display:block;margin-bottom:10px;font-size:13px;color:var(--mu)}label input,label select{margin-top:4px;color:var(--tx)}
@@ -94,7 +94,7 @@ input,select,textarea{font-size:16px}
 <script>
 // === CONFIGURACIÓN: pega aquí los datos de tu proyecto Supabase (Project Settings > API) ===
 const SUPABASE_URL='https://cemkgxysqwmoaptwaqdw.supabase.co',SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlbWtneHlzcXdtb2FwdHdhcWR3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MjQwNjcsImV4cCI6MjEwODEwMDA2N30.HDZrn9SSN6aL5Wh6M7ec2Vrm8jeTwetTq9FJ1XtmIZM';
-const U=()=>'x'+Math.random().toString(36).slice(2,8);
+const U=()=>'x'+Math.random().toString(36).slice(2,12);
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const seed=()=>({accounts:[{id:'a1',name:'Tarjeta',ini:0},{id:'a2',name:'Efectivo',ini:0}],
 cats:[['Comida','out'],['Transporte','out'],['Vivienda','out'],['Ocio','out'],['Suscripciones','out'],['Salud','out'],['Nómina','in'],['Ingresos extra','in']].map(c=>({id:U(),name:c[0],type:c[1]})),
@@ -102,7 +102,7 @@ tx:[],goals:[],cur:'ARS',sd:1});
 let S=seed();
 
 let nf;const setNf=()=>nf=new Intl.NumberFormat('es-ES',{style:'currency',currency:S.cur});
-const fm=n=>`<span class="amt">${nf.format(n)}</span>`;
+const fm=n=>`<span class="amt">${V.hide?'*****':nf.format(n)}</span>`;
 const dt=s=>new Date(s),p2=n=>String(n).padStart(2,'0');
 const iso=d=>d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())+'T'+p2(d.getHours())+':'+p2(d.getMinutes());
 const fd=s=>dt(s).toLocaleDateString('es-ES',{day:'numeric',month:'short'})+', '+p2(dt(s).getHours())+':'+p2(dt(s).getMinutes());
@@ -239,7 +239,7 @@ else if(a=='csv'){const c=['fecha,tipo,concepto,categoria,cuenta,importe',...S.t
 modal('Exportar a CSV',`<p class="mu">Copia este texto y pégalo en un archivo .csv o en tu hoja de cálculo.</p><textarea id="csvt" readonly>${esc(c)}</textarea><button class="btn" style="margin-top:10px" data-a="cp">Copiar</button>`)}
 else if(a=='cp'){const t=document.getElementById('csvt');t.select();try{navigator.clipboard.writeText(t.value)}catch(e){document.execCommand('copy')}el.textContent='Copiado'}
 else if(a=='wipe'){modal('¿Borrar todo?','<p>Se eliminarán cuentas, movimientos y objetivos de tu cuenta. No se puede deshacer.</p><div class="row"><button class="btn" data-a="wipe2">Sí, borrar todo</button><button class="btn ghost" data-a="close">Cancelar</button></div>')}
-else if(a=='logout'){sb.auth.signOut()}else if(a=='wipe2'){S=seed();save();close();render()}});
+else if(a=='logout'){logout()}else if(a=='wipe2'){S=seed();save();close();render()}});
 document.addEventListener('input',ev=>{if(ev.target.id=='q'){V.q=ev.target.value;const p=ev.target.selectionStart;render();const q=document.getElementById('q');q.focus();q.setSelectionRange(p,p)}});
 document.addEventListener('change',ev=>{const t=ev.target,d=t.dataset;
 if(d.k){const L={acc:S.accounts,cat:S.cats,goal:S.goals}[d.k],x=L.find(y=>y.id==d.id);if(x){x[d.f]=d.f=='name'?t.value.trim()||x.name:parseFloat(t.value)||0;save();render()}}
@@ -249,15 +249,66 @@ let USER=null,P0={},mode='in',REC=false,LOADED=false,svT;
 const $=i=>document.getElementById(i);
 const ini=()=>String(P0.first_name||(USER&&USER.email)||'?')[0].toUpperCase();
 const tr=m=>({'Invalid login credentials':'Email o contraseña incorrectos.','User already registered':'Ese email ya está registrado.','Email not confirmed':'Confirma tu email antes de entrar (revisa tu correo).','Password should be at least 6 characters.':'La contraseña es demasiado corta.'})[m]||m;
-function setSync(t){const el=$('sync');el.textContent=t;el.classList.add('on');if(t=='Guardado')setTimeout(()=>el.classList.remove('on'),1500)}
-function save(){if(!USER||!LOADED)return;clearTimeout(svT);setSync('Guardando…');svT=setTimeout(async()=>{const{error}=await sb.from('user_data').upsert({user_id:USER.id,data:S,updated_at:new Date().toISOString()});setSync(error?'Error al guardar: '+error.message:'Guardado')},500)}
+const KEYS={acc:'accounts',cat:'cats',tx:'tx',goal:'goals'},freshM=()=>({base:{},ts:{},dirty:{},kind:{},del:{},pull:''});
+let M=freshM(),syncing=false,lastErr='';
+function setSync(t,keep){const el=$('sync');el.textContent=t;el.classList.add('on');clearTimeout(setSync.h);if(!keep)setSync.h=setTimeout(()=>el.classList.remove('on'),t=='Guardado'?1500:4000)}
+function persist(){try{localStorage.setItem('md2_'+USER.id,JSON.stringify({S,M,P:P0}))}catch(e){}}
+// Detecta qué registros cambiaron (nuevos, editados o borrados) comparando con la última versión conocida
+function diff(){
+  const now=Date.now(),cur={},stamp=id=>Math.max(now,(M.ts[id]||0)+1);
+  for(const k in KEYS)(S[KEYS[k]]||[]).forEach(x=>cur[x.id]=[k,JSON.stringify(x)]);
+  cur.settings=['settings',JSON.stringify({cur:S.cur,sd:S.sd})];
+  for(const id in cur){if(M.base[id]!==cur[id][1]){M.base[id]=cur[id][1];M.kind[id]=cur[id][0];M.ts[id]=stamp(id);M.dirty[id]=1;M.del[id]=false}}
+  for(const id in M.base){if(!cur[id]){delete M.base[id];M.ts[id]=stamp(id);M.dirty[id]=1;M.del[id]=true}}
+}
+// Aplica un registro recibido del servidor solo si es más reciente que el que ya tengo
+function applyRemote(r){
+  if((M.ts[r.id]||0)>=r.ts)return false;
+  M.ts[r.id]=r.ts;delete M.dirty[r.id];
+  if(r.kind=='settings'){S.cur=(r.data&&r.data.cur)||S.cur;S.sd=(r.data&&r.data.sd)||S.sd;M.base.settings=JSON.stringify({cur:S.cur,sd:S.sd});M.kind.settings='settings';return true}
+  const key=KEYS[r.kind];if(!key)return false;
+  const L=S[key],i=L.findIndex(x=>x.id==r.id);M.kind[r.id]=r.kind;
+  if(r.deleted){if(i>=0)L.splice(i,1);delete M.base[r.id];M.del[r.id]=true}
+  else{M.del[r.id]=false;if(i>=0)L[i]=r.data;else L.push(r.data);M.base[r.id]=JSON.stringify(r.data)}
+  return true}
+async function push(){
+  const ids=Object.keys(M.dirty);if(!ids.length)return true;
+  const items=ids.map(id=>({id,kind:M.kind[id],data:M.del[id]?{}:JSON.parse(M.base[id]),deleted:!!M.del[id],ts:M.ts[id]}));
+  const{error}=await sb.rpc('push_records',{items});
+  if(error){lastErr=error.message;return false}
+  items.forEach(it=>{if(M.ts[it.id]==it.ts)delete M.dirty[it.id]});persist();return true}
+async function pull(){
+  let from=0,ch=false,max=M.pull||'1970-01-01T00:00:00Z';
+  for(;;){
+    const{data,error}=await sb.from('records').select('id,kind,data,deleted,ts,srv_at').gte('srv_at',M.pull||'1970-01-01T00:00:00Z').order('srv_at').order('id').range(from,from+999);
+    if(error){lastErr=error.message;return null}
+    data.forEach(r=>{if(applyRemote(r))ch=true;if(r.srv_at>max)max=r.srv_at});
+    if(data.length<1000)break;from+=1000}
+  M.pull=max;persist();return ch}
+async function syncNow(){
+  if(!USER||!LOADED||syncing)return;
+  const had=Object.keys(M.dirty).length;
+  if(!navigator.onLine){if(had)setSync('Sin conexión · se enviará al volver',true);return}
+  syncing=true;let ok=true;
+  try{diff();ok=await push();const ch=await pull();if(ch===null)ok=false;if(ch){diff();persist();render()}}catch(e){ok=false;lastErr=String(e)}
+  syncing=false;
+  const n=Object.keys(M.dirty).length;
+  if(!ok)setSync('Sin conexión · se enviará al volver',true);else if(n)setTimeout(syncNow,300);else if(had)setSync('Guardado')}
+function save(){if(!USER||!LOADED)return;diff();persist();setSync(navigator.onLine?'Guardando…':'Sin conexión · se enviará al volver',!navigator.onLine);clearTimeout(svT);svT=setTimeout(syncNow,500)}
 async function load(){
-  const{data,error}=await sb.from('user_data').select('data').eq('user_id',USER.id).maybeSingle();
-  if(error){$('app').innerHTML=`<div class="card"><b>No se pudieron cargar tus datos.</b><div class="mu">${esc(error.message)}. ¿Ejecutaste schema.sql en Supabase?</div></div>`;return false}
-  S=data&&data.data&&data.data.accounts?data.data:seed();
+  let c=null;try{c=JSON.parse(localStorage.getItem('md2_'+USER.id))}catch(e){}
+  if(c&&c.S&&c.M&&c.S.accounts){S=c.S;M=c.M;P0=c.P||{};LOADED=true;diff();persist();return true}
+  if(!navigator.onLine){$('app').innerHTML='<div class="card"><b>Sin conexión.</b><div class="mu">Conéctate a internet una vez para cargar tus datos en este dispositivo.</div></div>';return false}
+  S={accounts:[],cats:[],tx:[],goals:[],cur:'ARS',sd:1};M=freshM();
+  const ch=await pull();
+  if(ch===null){$('app').innerHTML=`<div class="card"><b>No se pudieron cargar tus datos.</b><div class="mu">${esc(lastErr)}. ¿Ejecutaste schema.sql completo en Supabase?</div></div>`;return false}
+  if(!Object.keys(M.ts).length){const lg=await sb.from('user_data').select('data').eq('user_id',USER.id).maybeSingle();S=lg.data&&lg.data.data&&lg.data.data.accounts?lg.data.data:seed()}
   const p=await sb.from('profiles').select('first_name,last_name').eq('id',USER.id).maybeSingle();P0=p.data||{};
-  LOADED=true;if(!data)save();return true}
-async function start(){if(!REC)$('auth').classList.remove('open');if(await load())render()}
+  LOADED=true;diff();persist();return true}
+async function start(){if(!REC)$('auth').classList.remove('open');if(await load()){render();syncNow()}}
+async function logout(){await syncNow();if(Object.keys(M.dirty).length&&!confirm('Tienes cambios que aún no se enviaron al servidor. Si cierras sesión se perderán. ¿Cerrar sesión igualmente?'))return;try{localStorage.removeItem('md2_'+USER.id)}catch(e){}sb.auth.signOut()}
+addEventListener('online',()=>syncNow());addEventListener('offline',()=>setSync('Sin conexión · tus cambios se guardan en este dispositivo',true));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncNow()});setInterval(syncNow,30000);
 function authUI(msg){
   const A=$('auth');A.classList.add('open');
   if(!sb){A.innerHTML='<div class="ab"><h2>Falta configurar Supabase</h2><p class="mu">Abre index.html y pega tu SUPABASE_URL y tu SUPABASE_ANON_KEY al inicio del script. Mira el README.</p></div>';return}
