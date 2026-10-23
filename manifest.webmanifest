@@ -10,15 +10,15 @@
   "background_color": "#0a0d09",
   "theme_color": "#b8ff3c",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    { "src": "images/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "images/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ],
   "screenshots": [
-    { "src": "screenshot/screenshot1.png", "sizes": "784x1600", "type": "image/png", "platform": "wide" },
-    { "src": "screenshot/screenshot2.png", "sizes": "784x1600", "type": "image/png", "platform": "wide" },
-    { "src": "screenshot/screenshot3.png", "sizes": "784x1600", "type": "image/png", "platform": "wide" },
-    { "src": "screenshot/screenshot4.png", "sizes": "784x1600", "type": "image/png", "platform": "wide" }
+    { "src": "images/screenshot1.png", "sizes": "784x1600", "type": "image/png", "platform": "wide" },
+    { "src": "images/screenshot2.png", "sizes": "784x1600", "type": "image/png", "platform": "wide" },
+    { "src": "images/screenshot3.png", "sizes": "784x1600", "type": "image/png", "platform": "wide" },
+    { "src": "images/screenshot4.png", "sizes": "784x1600", "type": "image/png", "platform": "wide" }
   ],
   "id": "app-midinero"
 }
