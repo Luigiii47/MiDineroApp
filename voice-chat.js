@@ -28,17 +28,17 @@
   const sim = (w, t) => w == t || (w.length > 3 && t.length > 3 &&
   (lev(w, t) <= (t.length > 6 ? 2 : 1) || w.startsWith(t) || t.startsWith(w)));
   const IN = /\b(ingres|sueld|cobr|salari|nomin|recib|me pagaron|me depositaron)|\bgane\b/;
-  const DROP = new Set(['gaste', 'gasto', 'gastamos', 'pague', 'pago', 'compre', 'compra', 'cobre', 'cobro', 'recibi','gane', 'ingrese', 'ingreso', 'ingresos', 'pagaron', 'depositaron', 'pesos', 'peso', 'ars', 'mil', 'k', 'hoy']);
+  const DROP = new Set(['gaste', 'gasto', 'gastamos', 'pague', 'pago', 'compre', 'compra', 'cobre', 'cobro', 'recibi','gane', 'ingrese', 'ingreso', 'ingresos', 'pagaron', 'depositaron', 'pesos', 'peso', 'ars', 'mil', 'k', 'hoy', 'ahora', 'ayer']);
   const STOP = new Set(['en', 'de', 'del', 'por', 'para', 'a', 'al', 'con', 'el', 'la', 'los', 'las', 'un', 'una', 'mi', 'mis', 'desde', 'y', 'que', 'me']);
   const SYN = {
     comida: ['super', 'supermercado', 'almuerzo', 'cena', 'desayuno', 'merienda', 'restaurante', 'cafe', 'pizza', 'delivery', 'pan'],
-    transporte: ['uber', 'cabify', 'taxi', 'nafta', 'colectivo', 'bondi', 'sube', 'subte', 'tren', 'peaje'],
-    vivienda: ['alquiler', 'luz', 'gas', 'agua', 'expensas', 'internet', 'wifi'],
-    ocio: ['cine', 'bar', 'salida', 'boliche', 'fiesta', 'recital', 'viaje'],
-    suscripciones: ['suscripcion', 'netflix', 'spotify', 'youtube', 'disney', 'hbo', 'icloud'],
-    salud: ['farmacia', 'medico', 'doctor', 'remedio', 'remedios', 'dentista', 'prepaga'],
-    nomina: ['sueldo', 'salario', 'haber', 'quincena'],
-    'ingresos extra': ['extra', 'venta', 'freelance', 'propina', 'regalo']
+    transporte: ['uber', 'cabify', 'taxi', 'nafta', 'colectivo', 'bondi', 'sube', 'subte', 'tren', 'peaje', 'didi', 'movilidad', 'bicicleta', 'moto', 'auto', 'estacionamiento'],
+    vivienda: ['alquiler', 'luz', 'gas', 'agua', 'expensas', 'internet', 'wifi', 'wi-fi'],
+    ocio: ['cine', 'bar', 'salida', 'boliche', 'fiesta', 'recital', 'viaje', 'hotel', 'joda', 'turismo', 'vacaciones'],
+    suscripciones: ['suscripcion', 'netflix', 'spotify', 'youtube', 'disney', 'hbo', 'icloud', 'prime', 'twitch', 'tiktok', 'hulu', 'deezer', 'paramount', 'apple', 'google', 'microsoft', 'adobe', 'canva', 'notion', 'slack', 'dropbox'],
+    salud: ['farmacia', 'medico', 'doctor', 'remedio', 'remedios', 'dentista', 'prepaga', 'obra social', 'psicologo', 'psiquiatra', 'hospital', 'clinica', 'vacuna', 'vacunas', 'gimnasio', 'entrenador', 'nutricionista', 'masaje', 'fisioterapia', 'kinesio'],
+    nomina: ['sueldo', 'salario', 'haber', 'quincena', 'nómina', 'recibo', 'pago', 'cobro', 'deposito', 'transferencia'],
+    'ingresos extra': ['extra', 'venta', 'freelance', 'propina', 'regalo', 'premio', 'bono', 'comision', 'inversion', 'interes', 'dividendo'],
   };
 
   /* ---------- Parser ---------- */
