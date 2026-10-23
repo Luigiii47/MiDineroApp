@@ -86,20 +86,32 @@
       return `<div class="tx" data-a="edit" data-id="${t.id}"><div class="ic ${o ? 'up' : x ? 'dn' : ''}">${ic}</div><div class="m"><b>${nm}</b><span class="mu">${fd(t.date)} · ${sub}</span></div><b class="${o ? 'up' : x ? 'dn' : ''}">${o ? '+' : x ? '−' : ''}${fm(t.amt)}</b></div>`;
     }
 
+    function homeRow(t) {
+      const o = t.type == 'in', x = t.type == 'out', ic = o ? '+' : x ? '−' : t.type == 'goal' ? '◇' : '⇄';
+      const sub = t.type == 'tr' ? `Traspaso · ${an(t.acc)} → ${an(t.to)}` : t.type == 'goal' ? `Objetivo · ${an(t.acc)}` : `${cn(t.cat)} · ${an(t.acc)}${t.rec ? ' · ↻' : ''}`;
+  
+      // Si pasa de 15 caracteres, toma los primeros 15 y añade '..'
+      const rawDesc = t.desc || '';
+      const shortDesc = rawDesc.length > 15 ? rawDesc.slice(0, 15) + '..' : rawDesc;
+      const nm = t.type == 'tr' ? 'Traspaso' : t.type == 'goal' ? 'Aporte a objetivo' : esc(shortDesc);
+
+      return `<div class="tx" data-a="edit" data-id="${t.id}"><div class="ic ${o ? 'up' : x ? 'dn' : ''}">${ic}</div><div class="m"><b>${nm}</b><span class="mu">${fd(t.date)} · ${sub}</span></div><b class="${o ? 'up' : x ? 'dn' : ''}">${o ? '+' : x ? '−' : ''}${fm(t.amt)}</b></div>`;
+    }
+
     function home() {
       const [s, e] = rng(1), inc = sum('in', s, e), exp = sum('out', s, e), cs = S.accounts.reduce((a, x) => a + bal(x), 0), gt = S.goals.reduce((a, g) => a + gs(g), 0);
       const last = [...S.tx].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
       return `<div class="top"><div><h1>Mi<span>Dinero</span></h1><div class="sub">Tus finanzas, bajo control</div></div><div class="av">${ini()}</div></div><button class="btn ghost" style="margin-bottom:22px" data-a="hide">${V.hide ? 'Mostrar' : 'Ocultar'} importes</button>
-<div class="grid"><div><div class="sub">Tu patrimonio</div><div class="big">${fm(cs + gt)}</div>
-<div class="grid" style="margin-top:14px"><div><div class="mu">En tus cuentas</div><b>${fm(cs)}</b></div><div><div class="mu">En objetivos</div><b>${fm(gt)}</b></div></div></div>
-<div class="card"><div class="row sp"><h3>Tu mes</h3><span class="mu">${fs(s).replace(/ \d{4}/, '')} – ${fs(new Date(e - 864e5))}</span></div>
-<div class="grid"><div><div class="mu">Ingresos</div><b class="up" style="font-size:20px">${fm(inc)}</b></div><div><div class="mu">Gastos</div><b class="dn" style="font-size:20px">${fm(exp)}</b></div></div>
-<div class="bar r"><i style="width:${inc ? Math.min(100, exp / inc * 100) : exp ? 100 : 0}%"></i></div><div class="mu">${inc ? `Has usado el ${Math.round(exp / inc * 100)}% de tus ingresos.` : 'Aún no hay ingresos este mes.'}</div>
-<div class="row sp" style="margin-top:12px"><span>Resultado del mes</span><b class="${inc - exp >= 0 ? 'up' : 'dn'}" style="font-size:20px">${fm(inc - exp)}</b></div></div></div>
-<div class="row sp" style="margin:22px 0 8px"><div class="sec" style="margin:0">Tus cuentas</div><button class="btn ghost sm" data-a="form" data-v="tr">⇄ Mover</button></div>
-<div class="scroll">${S.accounts.map(a => `<div class="card"><b>${esc(a.name)}</b><div class="big" style="font-size:28px">${fm(bal(a))}</div><div class="mu">Saldo actual</div></div>`).join('') || '<div class="mu">Crea una cuenta en Ajustes.</div>'}</div>
-<div class="grid" style="margin-top:22px"><div><div class="row sp"><div class="sec">Últimos movimientos</div><a class="mu" href="#" data-a="go" data-v="mov">Ver todos</a></div><div class="card list">${last.map(row).join('') || '<div class="tx mu">Sin movimientos. Pulsa “Nuevo movimiento” para empezar.</div>'}</div></div>
-<div><div class="row sp"><div class="sec">Objetivos de ahorro</div><a class="mu" href="#" data-a="set" data-v="goal">Gestionar</a></div>${goals()}</div></div>`;
+      <div class="grid"><div><div class="sub">Tu patrimonio</div><div class="big">${fm(cs + gt)}</div>
+      <div class="grid" style="margin-top:14px"><div><div class="mu">En tus cuentas</div><b>${fm(cs)}</b></div><div><div class="mu">En objetivos</div><b>${fm(gt)}</b></div></div></div>
+      <div class="card"><div class="row sp"><h3>Tu mes</h3><span class="mu">${fs(s).replace(/ \d{4}/, '')} – ${fs(new Date(e - 864e5))}</span></div>
+      <div class="grid"><div><div class="mu">Ingresos</div><b class="up" style="font-size:20px">${fm(inc)}</b></div><div><div class="mu">Gastos</div><b class="dn" style="font-size:20px">${fm(exp)}</b></div></div>
+      <div class="bar r"><i style="width:${inc ? Math.min(100, exp / inc * 100) : exp ? 100 : 0}%"></i></div><div class="mu">${inc ? `Has usado el ${Math.round(exp / inc * 100)}% de tus ingresos.` : 'Aún no hay ingresos este mes.'}</div>
+      <div class="row sp" style="margin-top:12px"><span>Resultado del mes</span><b class="${inc - exp >= 0 ? 'up' : 'dn'}" style="font-size:20px">${fm(inc - exp)}</b></div></div></div>
+      <div class="row sp" style="margin:22px 0 8px"><div class="sec" style="margin:0">Tus cuentas</div><button class="btn ghost sm" data-a="form" data-v="tr">⇄ Mover</button></div>
+      <div class="scroll">${S.accounts.map(a => `<div class="card"><b>${esc(a.name)}</b><div class="big" style="font-size:28px">${fm(bal(a))}</div><div class="mu">Saldo actual</div></div>`).join('') || '<div class="mu">Crea una cuenta en Ajustes.</div>'}</div>
+      <div class="grid" style="margin-top:22px"><div><div class="row sp"><div class="sec">Últimos movimientos</div><a class="mu" href="#" data-a="go" data-v="mov">Ver todos</a></div><div class="card list">${last.map(homeRow).join('') || '<div class="tx mu">Sin movimientos. Pulsa “Nuevo movimiento” para empezar.</div>'}</div></div>
+      <div><div class="row sp"><div class="sec">Objetivos de ahorro</div><a class="mu" href="#" data-a="set" data-v="goal">Gestionar</a></div>${goals()}</div></div>`;
     }
 
     function goals() {
