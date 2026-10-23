@@ -31,14 +31,38 @@
   const DROP = new Set(['gaste', 'gasto', 'gastamos', 'pague', 'pago', 'compre', 'compra', 'cobre', 'cobro', 'recibi','gane', 'ingrese', 'ingreso', 'ingresos', 'pagaron', 'depositaron', 'pesos', 'peso', 'ars', 'mil', 'k', 'hoy', 'ahora', 'ayer']);
   const STOP = new Set(['en', 'de', 'del', 'por', 'para', 'a', 'al', 'con', 'el', 'la', 'los', 'las', 'un', 'una', 'mi', 'mis', 'desde', 'y', 'que', 'me']);
   const SYN = {
-    comida: ['super', 'supermercado', 'almuerzo', 'cena', 'desayuno', 'merienda', 'restaurante', 'cafe', 'pizza', 'delivery', 'pan'],
-    transporte: ['uber', 'cabify', 'taxi', 'nafta', 'colectivo', 'bondi', 'sube', 'subte', 'tren', 'peaje', 'didi', 'movilidad', 'bicicleta', 'moto', 'auto', 'estacionamiento'],
-    vivienda: ['alquiler', 'luz', 'gas', 'agua', 'expensas', 'internet', 'wifi', 'wi-fi'],
-    ocio: ['cine', 'bar', 'salida', 'boliche', 'fiesta', 'recital', 'viaje', 'hotel', 'joda', 'turismo', 'vacaciones'],
-    suscripciones: ['suscripcion', 'netflix', 'spotify', 'youtube', 'disney', 'hbo', 'icloud', 'prime', 'twitch', 'tiktok', 'hulu', 'deezer', 'paramount', 'apple', 'google', 'microsoft', 'adobe', 'canva', 'notion', 'slack', 'dropbox'],
-    salud: ['farmacia', 'medico', 'doctor', 'remedio', 'remedios', 'dentista', 'prepaga', 'obra social', 'psicologo', 'psiquiatra', 'hospital', 'clinica', 'vacuna', 'vacunas', 'gimnasio', 'entrenador', 'nutricionista', 'masaje', 'fisioterapia', 'kinesio'],
-    nomina: ['sueldo', 'salario', 'haber', 'quincena', 'nómina', 'recibo', 'pago', 'cobro', 'deposito', 'transferencia'],
-    'ingresos extra': ['extra', 'venta', 'freelance', 'propina', 'regalo', 'premio', 'bono', 'comision', 'inversion', 'interes', 'dividendo'],
+    comida: [
+      'super', 'supermercado', 'almuerzo', 'cena', 'desayuno', 'merienda', 'restaurante', 'resto',
+      'cafe', 'cafeteria', 'pizza', 'pizzas', 'empanada', 'empanadas', 'delivery', 'pan', 'panaderia',
+      'pancho', 'panchos', 'hamburguesa', 'burger', 'kiosco', 'facturas', 'asado', 'carne', 'carniceria',
+      'verdura', 'verduleria', 'fruta', 'helado', 'heladeria', 'bebida', 'cerveza', 'coca', 'almacen'
+    ],
+    transporte: [
+      'uber', 'cabify', 'didi', 'taxi', 'remis', 'nafta', 'combustible', 'gasoil', 'gnc',
+      'colectivo', 'bondi', 'sube', 'subte', 'tren', 'peaje', 'estacionamiento', 'cochera', 'pasaje'
+    ],
+    vivienda: [
+      'alquiler', 'luz', 'gas', 'agua', 'expensas', 'internet', 'wifi', 'cable', 'edenor', 'edesur',
+      'metrogas', 'aysa', 'mantenimiento', 'reparacion', 'limpieza'
+    ],
+    ocio: [
+      'cine', 'bar', 'salida', 'boliche', 'fiesta', 'recital', 'concierto', 'viaje', 'hotel',
+      'vacaciones', 'juego', 'steam', 'playstation', 'teatro', 'paseo'
+    ],
+    suscripciones: [
+      'suscripcion', 'netflix', 'spotify', 'youtube', 'disney', 'hbo', 'max', 'prime', 'amazon',
+      'icloud', 'drive', 'chatgpt', 'openai', 'apple', 'patreon'
+    ],
+    salud: [
+      'farmacia', 'medico', 'doctor', 'remedio', 'remedios', 'medicamento', 'medicamentos',
+      'dentista', 'odontologo', 'prepaga', 'osde', 'swiss', 'galeno', 'consulta', 'optica', 'analisis'
+    ],
+    nomina: [
+      'sueldo', 'salario', 'haber', 'quincena', 'paga', 'aguinaldo', 'honorarios'
+    ],
+    'ingresos extra': [
+      'extra', 'venta', 'freelance', 'propina', 'regalo', 'premio', 'reintegro', 'devolucion', 'plazo fijo', 'interes'
+    ]
   };
 
   /* ---------- Parser ---------- */
@@ -56,8 +80,10 @@
 
   const score = (words, name, syn) => {
     const t = nz(name).split(/[^a-z0-9]+/).filter(Boolean);
-    const s = t.length ? t.filter(x => words.some(w => sim(w, x))).length / t.length : 0;
-    return Math.max(s, syn && syn.some(k => words.includes(k)) ? .9 : 0);
+    const nameMatch = t.length ? t.filter(x => words.some(w => sim(w, x))).length / t.length : 0;
+    const synMatch = syn && syn.some(k => words.some(w => w === k || (w.length > 4 && k.length > 4 && (w.startsWith(k) || k.startsWith(w)))));
+    if (synMatch) return 0.95;
+    return nameMatch;
   };
   const pick = (list, words, syn) => {
     let best = null, bs = 0;
