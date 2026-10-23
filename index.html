@@ -49,7 +49,7 @@
     const setNf = () => nf = new Intl.NumberFormat('es-ES', { style: 'currency', currency: S.cur });
     const fm = n => `<span class="amt">${V.hide ? '*****' : nf.format(n)}</span>`;
     const dt = s => new Date(s), p2 = n => String(n).padStart(2, '0');
-    const iso = d => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + 'T' + p2(d.getHours()) + ':' + p2(d.getMinutes());
+    const iso = d => d.getFullYear() + '-' + p2(d.getMonth() + 1) + '-' + p2(d.getDate()) + 'T' + p2(d.getHours()) + ':' + p2(d.getMinutes()) + ':' + p2(d.getSeconds());
     const fd = s => dt(s).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) + ', ' + p2(dt(s).getHours()) + ':' + p2(dt(s).getMinutes());
     const fs = d => d.toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
     const cn = id => (S.cats.find(c => c.id == id) || { name: 'Sin categoría' }).name;
@@ -100,7 +100,7 @@
 
     function home() {
       const [s, e] = rng(1), inc = sum('in', s, e), exp = sum('out', s, e), cs = S.accounts.reduce((a, x) => a + bal(x), 0), gt = S.goals.reduce((a, g) => a + gs(g), 0);
-      const last = [...S.tx].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
+      const last = [...S.tx].sort((a, b) => b.date.localeCompare(a.date) || (b.id > a.id ? 1 : -1)).slice(0, 5);
       return `<div class="top"><div><h1>Mi<span>Dinero</span></h1><div class="sub">Tus finanzas, bajo control</div></div><div class="av">${ini()}</div></div><button class="btn ghost" style="margin-bottom:22px" data-a="hide">${V.hide ? 'Mostrar' : 'Ocultar'} importes</button>
       <div class="grid"><div><div class="sub">Tu patrimonio</div><div class="big">${fm(cs + gt)}</div>
       <div class="grid" style="margin-top:14px"><div><div class="mu">En tus cuentas</div><b>${fm(cs)}</b></div><div><div class="mu">En objetivos</div><b>${fm(gt)}</b></div></div></div>
@@ -123,7 +123,7 @@
 
     function list() {
       const q = V.q.toLowerCase();
-      return [...S.tx].filter(t => (V.f == 'all' || (V.f == 'rec' ? t.rec : t.type == V.f)) && (!q || (t.desc || '').toLowerCase().includes(q) || cn(t.cat).toLowerCase().includes(q) || an(t.acc).toLowerCase().includes(q)) && (!V.day || t.date.slice(0, 10) == V.day)).sort((a, b) => b.date.localeCompare(a.date));
+      return [...S.tx].filter(t => (V.f == 'all' || (V.f == 'rec' ? t.rec : t.type == V.f)) && (!q || (t.desc || '').toLowerCase().includes(q) || cn(t.cat).toLowerCase().includes(q) || an(t.acc).toLowerCase().includes(q)) && (!V.day || t.date.slice(0, 10) == V.day)).sort((a, b) => b.date.localeCompare(a.date) || (b.id > a.id ? 1 : -1));
     }
 
     function mov() {
@@ -139,9 +139,9 @@
         body = `<div class="row sp mu" style="margin-bottom:6px"><span>${L.length} movimientos${V.day ? ' del ' + V.day : ''}</span><span><b class="up">+${fm(i)}</b> <b class="dn">−${fm(o)}</b></span></div><div class="card list lg">${L.map(row).join('') || '<div class="tx mu">No hay movimientos con estos filtros.</div>'}</div>`;
       }
       return `<div class="top"><div><div class="sub">${(d => d.charAt(0).toUpperCase() + d.slice(1))(new Date().toLocaleDateString('es-ES', { month: 'long', year: 'numeric' }))}</div><h1>Movimientos</h1></div><button class="btn" data-a="form">+</button></div>
-<button class="btn ghost" style="margin-bottom:12px" data-a="form" data-v="tr">⇄ Traspasos entre cuentas</button><div class="seg"><button class="${V.mode == 'list' ? 'on' : ''}" data-a="mode" data-v="list">Lista</button><button class="${V.mode == 'cal' ? 'on' : ''}" data-a="mode" data-v="cal">Calendario</button></div>
-<input id="q" ${cal ? 'hidden' : ''} placeholder="Buscar por concepto, cuenta o categoría" value="${esc(V.q)}"><div class="chips" ${cal ? 'hidden' : ''}>${chips.map(c => `<button class="${V.f == c[0] ? 'on' : ''}" data-a="chip" data-v="${c[0]}">${c[1]}</button>`).join('')}</div>
-${V.mode == 'cal' ? calv() : ''}${body}`;
+      <button class="btn ghost" style="margin-bottom:12px" data-a="form" data-v="tr">⇄ Traspasos entre cuentas</button><div class="seg"><button class="${V.mode == 'list' ? 'on' : ''}" data-a="mode" data-v="list">Lista</button><button class="${V.mode == 'cal' ? 'on' : ''}" data-a="mode" data-v="cal">Calendario</button></div>
+      <input id="q" ${cal ? 'hidden' : ''} placeholder="Buscar por concepto, cuenta o categoría" value="${esc(V.q)}"><div class="chips" ${cal ? 'hidden' : ''}>${chips.map(c => `<button class="${V.f == c[0] ? 'on' : ''}" data-a="chip" data-v="${c[0]}">${c[1]}</button>`).join('')}</div>
+      ${V.mode == 'cal' ? calv() : ''}${body}`;
     }
 
     function calv() {
