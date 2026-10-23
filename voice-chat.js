@@ -3,6 +3,11 @@
   const $ = id => document.getElementById(id);
   const bar = $('wa-bar'), inp = $('wa-in'), btn = $('wa-btn'), hint = $('wa-hint');
   const HINT = 'Ej: “gasté 2500 en comida con tarjeta”';
+  const ICO = {
+    mic: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/></svg>',
+    send: '<svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M1.1 21.76 23.8 12.03 1.1 2.3l.01 7.91 13.62 1.82-13.62 1.82z"/></svg>',
+    stop: '<svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2.5"/></svg>'
+  };
   const ERR = {
     'not-allowed': 'Permiso de micrófono denegado.',
     'service-not-allowed': 'El navegador no permite el dictado aquí.',
@@ -88,7 +93,7 @@
   const say = (t, err) => { hint.textContent = t; hint.className = err ? 'err' : ''; };
   const paint = () => {
     const txt = inp.value.trim();
-    btn.textContent = listening ? '⏹️' : txt ? '➤' : '🎙️';
+    btn.innerHTML = listening ? ICO.stop : txt ? ICO.send : ICO.mic;
     btn.classList.toggle('rec', listening);
     btn.setAttribute('aria-label', listening ? 'Detener' : txt ? 'Enviar' : 'Hablar');
   };
@@ -109,7 +114,7 @@
     rec = new SR();
     rec.lang = 'es-AR'; rec.interimResults = true; rec.continuous = false;
     heard = ''; abort = false;
-    rec.onstart = () => { listening = true; say('Escuchando… toca ⏹️ para enviar'); paint(); };
+    rec.onstart = () => { listening = true; say('Escuchando… toca ■ para enviar'); paint(); };
     rec.onresult = e => { heard = Array.from(e.results, r => r[0].transcript).join('').trim(); inp.value = heard; paint(); };
     rec.onerror = e => { abort = true; say(ERR[e.error] || 'Error de voz: ' + e.error, 1); };
     rec.onend = () => { listening = false; paint(); if (!abort && heard) send(heard); };
