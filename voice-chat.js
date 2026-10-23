@@ -26,13 +26,10 @@
     return d[a.length][b.length];
   };
   const sim = (w, t) => w == t || (w.length > 3 && t.length > 3 &&
-    (lev(w, t) <= (t.length > 6 ? 2 : 1) || w.startsWith(t) || t.startsWith(w)));
-
+  (lev(w, t) <= (t.length > 6 ? 2 : 1) || w.startsWith(t) || t.startsWith(w)));
   const IN = /\b(ingres|sueld|cobr|salari|nomin|recib|me pagaron|me depositaron)|\bgane\b/;
-  const DROP = new Set(['gaste', 'gasto', 'gastamos', 'pague', 'pago', 'compre', 'compra', 'cobre', 'cobro', 'recibi',
-    'gane', 'ingrese', 'ingreso', 'ingresos', 'pagaron', 'depositaron', 'pesos', 'peso', 'ars', 'mil', 'k', 'hoy']);
-  const STOP = new Set(['en', 'de', 'del', 'por', 'para', 'a', 'al', 'con', 'el', 'la', 'los', 'las', 'un', 'una',
-    'mi', 'mis', 'desde', 'y', 'que', 'me']);
+  const DROP = new Set(['gaste', 'gasto', 'gastamos', 'pague', 'pago', 'compre', 'compra', 'cobre', 'cobro', 'recibi','gane', 'ingrese', 'ingreso', 'ingresos', 'pagaron', 'depositaron', 'pesos', 'peso', 'ars', 'mil', 'k', 'hoy']);
+  const STOP = new Set(['en', 'de', 'del', 'por', 'para', 'a', 'al', 'con', 'el', 'la', 'los', 'las', 'un', 'una', 'mi', 'mis', 'desde', 'y', 'que', 'me']);
   const SYN = {
     comida: ['super', 'supermercado', 'almuerzo', 'cena', 'desayuno', 'merienda', 'restaurante', 'cafe', 'pizza', 'delivery', 'pan'],
     transporte: ['uber', 'cabify', 'taxi', 'nafta', 'colectivo', 'bondi', 'sube', 'subte', 'tren', 'peaje'],
@@ -84,7 +81,7 @@
     while (w.length && STOP.has(w[w.length - 1].n)) w.pop();
     let desc = w.map(x => x.o).join(' ') || (cat ? cat.name : 'Movimiento');
     desc = desc.charAt(0).toUpperCase() + desc.slice(1);
-
+    desc = desc.slice(0, 20);
     return { id: U(), type, amt, desc, cat: cat ? cat.id : '', acc: acc.id, to: '', date: iso(new Date()), rec: false };
   }
 
