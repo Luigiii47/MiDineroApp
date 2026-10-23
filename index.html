@@ -19,6 +19,14 @@
   <div id="m"><div id="mb"></div></div>
   <div id="auth"></div>
   <div id="sync"></div>
+  <div id="wa-bar" hidden>
+    <div class="wa-top"><span id="wa-hint"></span><button type="button" id="wa-manual">Manual</button></div>
+    <div class="wa-row">
+      <button type="button" id="wa-x" aria-label="Cerrar">✕</button>
+      <input id="wa-in" placeholder="Escribe un movimiento…" autocomplete="off" enterkeyhint="send">
+      <button type="button" id="wa-btn" aria-label="Hablar">🎙️</button>
+    </div>
+  </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
   <script>
@@ -244,6 +252,11 @@ ${ty != 'tr' ? `<label>Concepto<input id="f_desc" value="${esc(F.desc)}"></label
     }
 
     function openForm(id, ty) {
+      if (!id && !ty && window.openWhatsAppBar) return openWhatsAppBar();
+      openManualForm(id, ty);
+    }
+
+    function openManualForm(id, ty) {
       if (!S.accounts.length) { alert('Primero crea una cuenta en Ajustes.'); return; }
       F = id ? { ...S.tx.find(x => x.id == id) } : { type: ty || 'out', amt: '', desc: '', acc: S.accounts[0].id, to: (S.accounts[1] || S.accounts[0]).id, date: iso(new Date()), rec: false };
       F.cat = F.cat || (S.cats.find(c => c.type == F.type) || {}).id;
@@ -621,5 +634,6 @@ ${ty != 'tr' ? `<label>Concepto<input id="f_desc" value="${esc(F.desc)}"></label
       addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
     }
   </script>
+  <script src="voice-chat.js"></script>
 </body>
 </html>
