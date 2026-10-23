@@ -17,7 +17,7 @@
 
 [hidden] { display: none !important; }
 * { box-sizing: border-box; }
-html, body { height: auto; }
+html, body { height: auto; overflow-x: hidden; max-width: 100vw; }
 body {
   margin: 0;
   background: radial-gradient(900px 500px at 15% -10%, #16240f 0, transparent 60%), #0a0d09;
@@ -82,7 +82,7 @@ nav .new {
 nav .new span { width: auto; height: auto; background: none !important; }
 
 /* Contenido Principal */
-main { margin-left: 210px; padding: 32px 28px 60px; max-width: 960px; }
+main { margin-left: 210px; padding: 32px 28px 60px; max-width: 960px; overflow-x: hidden; width: 100%; }
 .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
 h1 { font-weight: 800; letter-spacing: -1.5px; line-height: 1.05; font-size: 34px; }
 h1 span { color: var(--ac); }
@@ -144,6 +144,7 @@ h1 span { color: var(--ac); }
   padding: 14px 16px;
   border-bottom: 1px solid var(--line);
   cursor: pointer;
+  min-width: 0;
 }
 .tx:last-child { border: 0; }
 .ic {
@@ -158,8 +159,10 @@ h1 span { color: var(--ac); }
 }
 .ic.dn { background: #2a1b1a; }
 .ic.up { background: #24301a; }
-.tx .m { flex: 1; min-width: 0; }
+.tx .m { flex: 1; min-width: 0; overflow: hidden;}
 .tx .m b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx .m span.mu { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tx > b:last-child { flex-shrink: 0; white-space: nowrap; }
 .list { padding: 0; overflow: hidden; }
 .lg { display: grid; grid-template-columns: 1fr 1fr; column-gap: 14px; }
 .scroll { display: flex; gap: 12px; overflow-x: auto; padding-bottom: 6px; }
